@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TIEJUN Employee Verification</title>
+  <style>
+    body{margin:0;font-family:system-ui,Arial;background:#eef2f7}
+    .top{background:#0a7a4a;color:#fff;padding:16px 14px}
+    .top h1{margin:0;font-size:18px;letter-spacing:.3px}
+    .top p{margin:6px 0 0;font-size:13px;opacity:.9}
+
+    .wrap{max-width:460px;margin:16px auto;padding:0 12px}
+    .card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 8px 20px rgba(0,0,0,.08)}
+    .row{display:flex;gap:14px;align-items:center}
+    .photo{width:96px;height:96px;border-radius:14px;object-fit:cover;background:#dde6f2;border:2px solid #f3f6fb}
+    .name{font-size:18px;font-weight:800}
+    .id{margin-top:4px;color:#475467;font-size:13px}
+
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+    .field{background:#f6f8fc;border-radius:12px;padding:10px}
+    .label{font-size:12px;color:#667085}
+    .value{margin-top:4px;font-size:14px;font-weight:700;color:#101828}
+
+    .msg{margin-top:12px;font-size:13px;color:#667085}
+    .bad{color:#b42318;font-weight:800}
+  </style>
+</head>
+<body>
+  <div class="top">
+    <h1>TIEJUN</h1>
+    <p>Employee ID Verification</p>
+  </div>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="row">
+        <img id="photo" class="photo" alt="Employee Photo">
+        <div>
+          <div id="name" class="name">Loading…</div>
+          <div id="empid" class="id"></div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="field"><div class="label">Job Title</div><div id="job" class="value">—</div></div>
+        <div class="field"><div class="label">Department</div><div id="dept" class="value">—</div></div>
+        <div class="field"><div class="label">Company</div><div id="company" class="value">—</div></div>
+        <div class="field"><div class="label">Supplier</div><div id="supplier" class="value">—</div></div>
+        <div class="field"><div class="label">Iqama</div><div id="iqama" class="value">—</div></div>
+        <div class="field"><div class="label">Issue Date</div><div id="issue" class="value">—</div></div>
+        <div class="field"><div class="label">Expiry Date</div><div id="expiry" class="value">—</div></div>
+        <div class="field"><div class="label">Status</div><div id="status" class="value">—</div></div>
+      </div>
+
+      <div id="msg" class="msg"></div>
+    </div>
+  </div>
+
+<script>
+  const id = new URLSearchParams(location.search).get("id");
+  document.getElementById("empid").textContent = id ? ("Employee ID: " + id) : "Employee ID: (missing)";
+
+  fetch("./employees.json", { cache: "no-store" })
+    .then(r => r.json())
+    .then(db => {
+      if (!id || !db[id]) {
+        document.getElementById("name").textContent = "Not Found";
+        document.getElementById("msg").innerHTML = "<span class='bad'>No record found for this ID.</span>";
+        document.getElementById("photo").src = "./photos/default.jpg";
+        return;
+      }
+      const e = db[id];
+      document.getElementById("name").textContent = e.name || "—";
+      document.getElementById("job").textContent = e.jobTitle || "—";
+      document.getElementById("dept").textContent = e.department || "—";
+      document.getElementById("company").textContent = e.company || "—";
+      document.getElementById("supplier").textContent = e.supplier || "—";
+      document.getElementById("iqama").textContent = e.iqama || "—";
+      document.getElementById("issue").textContent = e.issueDate || "—";
+      document.getElementById("expiry").textContent = e.expiryDate || "—";
+      document.getElementById("status").textContent = e.status || "Active";
+      document.getElementById("photo").src = e.photo || "./photos/default.jpg";
+    })
+    .catch(() => {
+      document.getElementById("name").textContent = "Error";
+      document.getElementById("msg").innerHTML = "<span class='bad'>Could not load employees.json</span>";
+      document.getElementById("photo").src = "./photos/default.jpg";
+    });
+</script>
+</body>
+</html>
